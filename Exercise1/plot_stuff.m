@@ -23,7 +23,7 @@ font_size = struct(...
     'xlabel', 12,...
     'ylabel', 12);
 
-fig1 = figure(1); % Elevation rate
+fig1 = figure(1); %  Elevation rate
     plot(measurements.time, measurements.e_dot, 'color', 'g');
     hold on
     plot(measurements.time, measurements.p_dot, 'color', 'r');
