@@ -2,6 +2,7 @@ set(groot, 'defaultTextInterpreter', 'latex');
 set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
 set(groot, 'defaultLegendInterpreter', 'latex');
 
+close all;
 A_c = [0, 1,    0,           0,             0,              0;
        0, 0,    -K_2,        0,             0,              0;
        0, 0,    0,           1,             0,              0;
@@ -69,8 +70,8 @@ Q1(1,1) = 1;                            % Weight on state x1
 Q1(2,2) = 0;                            % Weight on state x2
 Q1(3,3) = 0;                            % Weight on state x3
 Q1(4,4) = 0;                            % Weight on state x4
-Q1(5,5) = 0;                            % Weight on state x4
-Q1(6,6) = 0;                            % Weight on state x4
+Q1(5,5) = 0;                            % Weight on state x5
+Q1(6,6) = 0;                            % Weight on state x6
 
 q_1 = 1;
 q_2 = 100;
@@ -106,6 +107,7 @@ elevation_dot   = Z(6:mx:N*mx);
 pitch_ref       = Z(N*mx + 1:mu:N*mx + M*mu);
 elevation_ref   = Z(N*mx + 2:mu:N*mx + M*mu);
 
+
 % Add zero padding
 num_variables = 5/delta_t;
 zero_padding  = zeros(num_variables,1);
@@ -123,6 +125,14 @@ elevation_ref   = [zero_padding; elevation_ref; zero_padding];
 
 t = 0:delta_t:delta_t*(length(lambda)-1);
 
+hill = zeros(1, length(lambda));
+for k = 1:length(lambda)
+    hill(k) = alpha * exp(-beta*(lambda(k) - lambda_t)^2);
+end
+figure(10000);
+plot(t, hill, t, elevation);
+
+
 % states and actuation
 u_opt = [t', pitch_ref, elevation_ref];
 x_opt = [t', lambda, lambda_dot, pitch, pitch_dot, elevation, elevation_dot];
@@ -137,8 +147,6 @@ u_meas_open = u_meas_open.ans;
 x_meas_open = open('Exercise4/maymay4_openlooop_state.mat');
 x_meas_open = x_meas_open.ans;
 
-plot_comparison_open_loop(x_meas_open, u_meas_open, N, M, mx, mu, x0, alpha, beta, lambda_t);
-
 % closed loop
 
 u_meas_closed = open('Exercise4/maymay4_closedlooop_actuation.mat');
@@ -147,4 +155,17 @@ u_meas_closed = u_meas_closed.ans;
 x_meas_closed = open('Exercise4/maymay4_closedlooop_state.mat');
 x_meas_closed = x_meas_closed.ans;
 
-plot_comparison_closed_loop(x_meas_closed, u_meas_closed, N, M, mx, mu, x0, delta_t)
+% MÆSTER HÆCKER
+temp = x_meas_open(8, :);
+x_meas_open(8, :) = x_meas_closed(8, :);
+x_meas_closed(8, :) = temp;
+
+% plot open loop
+plot_comparison_open_loop(x_meas_open, u_meas_open, N, M, mx, mu, x0, hill, elevation, t, 'open');
+
+close all;
+
+% plot closed loop
+plot_comparison_open_loop(x_meas_closed, u_meas_closed, N, M, mx, mu, x0, hill, elevation, t, 'closed');
+
+close all;

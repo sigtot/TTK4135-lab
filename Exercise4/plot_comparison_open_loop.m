@@ -1,6 +1,6 @@
-function plot_comparison_open_loop(x_meas, u_meas, N, M, mx, mu, x0, alpha, beta, lambda_t)
+function plot_comparison_open_loop(x_meas, u_meas, N, M, mx, mu, x0, hill_opt_real, elevation_opt_real, t_opt_real, prefix)
     
-    close all;
+    
     font_size = struct(...
         'legend', 10,...
         'title', 18,...
@@ -34,12 +34,6 @@ function plot_comparison_open_loop(x_meas, u_meas, N, M, mx, mu, x0, alpha, beta
 
     pitch_ref_meas      = u_meas(4, :);
     elevation_ref_meas  = u_meas(5, :);
-    
-    % hill
-    hill = zeros(1, size(t, 2));
-    for k = size(t, 2)
-        hill(k) = alpha * exp(-beta*(lambda_meas(k) - lambda_t)^2);
-    end
     
 
     %% Create figure
@@ -89,7 +83,7 @@ function plot_comparison_open_loop(x_meas, u_meas, N, M, mx, mu, x0, alpha, beta
     set(fig3, 'Units', 'Inches');
     pos1 = get(fig3, 'Position');
     set(fig3, 'PaperPositionMode', 'Auto', 'PaperUnits', 'Inches', 'PaperSize', [pos1(3), pos1(4)]);
-    print(fig3, strrep(strcat(PART_PATH, PART_AND_PROBLEM, FILE_NAME), '.', 'pnt'), '-dpdf', '-r0');
+    print(fig3, strrep(strcat(PART_PATH, prefix, PART_AND_PROBLEM, FILE_NAME), '.', 'pnt'), '-dpdf', '-r0');
 
 %%  Plot elevation
     fig5 = figure(97);
@@ -99,21 +93,26 @@ function plot_comparison_open_loop(x_meas, u_meas, N, M, mx, mu, x0, alpha, beta
 
     hold on
     
-    plot(t,elevation_opt, 'DisplayName', 'Optimal elevation'),grid
+    plot(t_opt_real,elevation_opt_real, '-.', 'DisplayName', 'Optimal elevation'),grid
     plot(t,elevation_meas, 'DisplayName', 'Actual elevation'),grid
-    plot(t,hill, 'DisplayName', 'Hill constraint'),grid
+    plot(t_opt_real,hill_opt_real, 'DisplayName', 'Hill constraint'),grid
 
     grid on
     
     legend show;
    
+    %% Time
+    xlabel({'time (s)'}, 'fontsize', font_size.xlabel)
+    
     %% Save to .pdf
     PART_PATH = 'Exercise4/figures/';
     PART_AND_PROBLEM = 'p43';
-    FILE_NAME = 'elevation_comparison_open';
+    FILE_NAME = 'elevation_comparison';
 
     set(fig5, 'Units', 'Inches');
     pos1 = get(fig5, 'Position');
     set(fig5, 'PaperPositionMode', 'Auto', 'PaperUnits', 'Inches', 'PaperSize', [pos1(3), pos1(4)]);
-    print(fig5, strrep(strcat(PART_PATH, PART_AND_PROBLEM, FILE_NAME), '.', 'pnt'), '-dpdf', '-r0');
+    print(fig5, strrep(strcat(PART_PATH, prefix, PART_AND_PROBLEM, FILE_NAME), '.', 'pnt'), '-dpdf', '-r0');
+    
+    hold off;
 end
