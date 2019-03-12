@@ -1,8 +1,3 @@
-% TTK4135 - Helicopter lab
-% Hints/template for problem 2.
-% Updated spring 2018, Andreas L. Flåten
-
-%% Initialization and model definition
 init02; % Change this to the init file corresponding to your helicopter
 set(groot, 'defaultTextInterpreter', 'latex');
 set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
@@ -64,32 +59,38 @@ Aeq = gen_aeq(A1, B1, N, mx, mu);       % Generate A, hint: gen_aeq
 beq_i = [0 0 0 0];             
 beq = [A1 * x0; repmat(beq_i', N - 1, 1)];              % Generate b
 
-%% Solve QP problem with linear model and plot
-P = [0.1, 1, 10];
-[z1, lambda, PhiOut] = solve_qp(P(1), Q1, N, M, c, Aeq, beq, vlb, vub, x0, mx, mu);
-[z2, lambda, PhiOut] = solve_qp(P(2), Q1, N, M, c, Aeq, beq, vlb, vub, x0, mx, mu);
-[z3, lambda, PhiOut] = solve_qp(P(3), Q1, N, M, c, Aeq, beq, vlb, vub, x0, mx, mu);
-plot_many(z1, N, M, mx, mu, x0, P(1), delta_t);
+%% Solve QP problem with linear mode
+[z, lambda, PhiOut] = solve_qp(1, Q1, N, M, c, Aeq, beq, vlb, vub, x0, mx, mu);
 
-solutions = [z1, z2, z3];
+x1 = [x0(1);z(1:mx:N*mx)];              % State x1 from solution
+x2 = [x0(2);z(2:mx:N*mx)];              % State x2 from solution
+x3 = [x0(3);z(3:mx:N*mx)];              % State x3 from solution
+x4 = [x0(4);z(4:mx:N*mx)];              % State x4 from solution
 
-plot_lambdas(solutions, N, M, mx, mu, x0, P, delta_t);
-
-data = load('C:\Users\sigurdvt\Documents\opt_reg\Exercise2\maymay2.mat');
-data = data.ans;
-plot_comparison(z2, data, N, M, mx, mu, x0, delta_t);
-%% Extract input
-u  = [z2(N*mx+1:N*mx+M*mu);z2(N*mx+M*mu)]; % Control input from solution
+u  = [z(N*mx+1:N*mx+M*mu);z(N*mx+M*mu)]; % Control input from solution
 
 % Add zero padding
 num_variables = 5/delta_t;
 zero_padding = zeros(num_variables,1);
 unit_padding  = ones(num_variables,1);
-u = [zero_padding; u; zero_padding];
-t = 0:delta_t:delta_t*(length(u)-1);
-z = [x0(1);z2(1:mx:N*mx)];
-z = [pi*unit_padding; z; zero_padding];
 
-% Export to simulink
-p_c = [t', u];
-travel = [t', z];
+u  = [zero_padding; u; zero_padding];
+x1 = [pi * unit_padding; x1; zero_padding];
+x2 = [zero_padding; x2; zero_padding];
+x3 = [zero_padding; x3; zero_padding];
+x4 = [zero_padding; x4; zero_padding];
+
+t = 0:delta_t:delta_t*(length(u)-1);
+
+x = [x1, x2, x3, x4];
+
+%% LQ controller
+Q = diag([1e3, 1, 1, 1]);
+R = diag([1]);
+
+[K, S, e] = dlqr(A1, B1, Q, R);
+
+%% System inputs
+
+u_opt = [t', u];
+x_opt = [t', x];
