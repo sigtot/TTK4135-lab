@@ -1,6 +1,6 @@
 % TTK4135 - Helicopter lab
 % Hints/template for problem 2.
-% Updated spring 2018, Andreas L. Flåten
+% Updated spring 2018, Andreas L. Flï¿½ten
 
 %% Initialization and model definition
 init02; % Change this to the init file corresponding to your helicopter
@@ -75,7 +75,7 @@ solutions = [z1, z2, z3];
 
 plot_lambdas(solutions, N, M, mx, mu, x0, P, delta_t);
 
-data = load('C:\Users\sigurdvt\Documents\opt_reg\Exercise2\maymay2.mat');
+data = load('Exercise2/maymay2.mat');
 data = data.ans;
 plot_comparison(z2, data, N, M, mx, mu, x0, delta_t);
 %% Extract input
