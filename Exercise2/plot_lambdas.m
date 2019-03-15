@@ -82,6 +82,6 @@ function plot_lambdas(solutions, N, M, mx, mu, x0, P, delta_t)
 
     set(fig3, 'Units', 'Inches');
     pos1 = get(fig3, 'Position');
-    set(fig3, 'PaperPositionMode', 'Auto', 'PaperUnits', 'Inches', 'PaperSize', [pos1(3), pos1(4) + 0.2]);
+    set(fig3, 'PaperPositionMode', 'Auto', 'PaperUnits', 'Inches', 'PaperSize', [pos1(3), pos1(4)]);
     print(fig3, strrep(strcat(PART_PATH, PART_AND_PROBLEM, FILE_NAME), '.', 'pnt'), '-dpdf', '-r0');
 end

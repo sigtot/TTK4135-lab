@@ -87,7 +87,7 @@ Aeq = gen_aeq(A_d, B_d, N, mx, mu);       % Generate A, hint: gen_aeq
 beq_i = [0 0 0 0 0 0];             
 beq = [A_d * x0; repmat(beq_i', N - 1, 1)];              % Generate b
 
-[K, S, e] = dlqr(A_d, B_d, Q1, P1);
+[K, S, e] = dlqr(A_d, B_d, diag([1e2,1,1,1,1e2,1]), diag([1,1]));
 
 f = @(x) 1/2 * x' * G * x; % objective_function2(x, N, M, mx, mu, lambda_f, q_1, q_2);
 
